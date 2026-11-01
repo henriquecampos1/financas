@@ -1,0 +1,206 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Cores que mudam entre o modo claro e o escuro (o tema segue o do sistema). */
+@theme inline {
+  --color-fundo: var(--fundo);
+  --color-cartao: var(--cartao);
+  --color-cartao-2: var(--cartao-2);
+  --color-borda: var(--borda);
+  --color-texto: var(--texto);
+  --color-suave: var(--suave);
+  --color-primaria: var(--primaria);
+  --color-primaria-texto: var(--primaria-texto);
+  --color-credito: var(--credito);
+  --color-receita: var(--receita);
+  --color-despesa: var(--despesa);
+  --color-perigo: var(--perigo);
+  --color-alerta: var(--alerta);
+  --color-sucesso: var(--sucesso);
+  --color-barra-ok: var(--barra-ok);
+  --color-barra-atencao: var(--barra-atencao);
+  --color-barra-excedido: var(--barra-excedido);
+}
+
+:root {
+  color-scheme: light;
+  --fundo: #f5f6f8;
+  --cartao: #ffffff;
+  --cartao-2: #eef0f3;
+  --borda: #e1e4ea;
+  --texto: #15181e;
+  --suave: #5d6472;
+  --primaria: #0d7a5f;
+  --primaria-texto: #ffffff;
+  --credito: #6a4bd8;
+  --receita: #1a7f37;
+  --despesa: #c42b1c;
+  --perigo: #b42318;
+  --alerta: #9a5b00;
+  --sucesso: #1a7f37;
+  --barra-ok: #22a06b;
+  --barra-atencao: #e2a400;
+  --barra-excedido: #d93a2b;
+  /* Formas de pagamento nos gráficos: ordem validada para daltonismo (claro e escuro). */
+  --grafico-credito: #6250d6;
+  --grafico-pix: #1baf7a;
+  --grafico-transferencia: #eb6834;
+  --grafico-debito: #2a78d6;
+  --grafico-dinheiro: #008300;
+  --grafico-outras: #9aa1ae;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --fundo: #0e1116;
+    --cartao: #171b22;
+    --cartao-2: #21262f;
+    --borda: #2b313c;
+    --texto: #e7e9ee;
+    --suave: #9aa1ae;
+    --primaria: #4fd1a5;
+    --primaria-texto: #0e1116;
+    --credito: #a996ff;
+    --receita: #5fd38a;
+    --despesa: #ff8a7a;
+    --perigo: #ff8a80;
+    --alerta: #ffc04d;
+    --sucesso: #5fd38a;
+    --barra-ok: #3ccf91;
+    --barra-atencao: #f5c242;
+    --barra-excedido: #ff6b5c;
+    --grafico-credito: #9085e9;
+    --grafico-pix: #199e70;
+    --grafico-transferencia: #d95926;
+    --grafico-debito: #3987e5;
+    --grafico-dinheiro: #008300;
+    --grafico-outras: #5d6472;
+  }
+}
+
+html,
+body {
+  background-color: var(--fundo);
+  color: var(--texto);
+}
+
+body {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior-y: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Na camada "base", para que classes como text-4xl ainda consigam aumentar a letra. */
+@layer base {
+  input,
+  select,
+  textarea {
+    font-size: 16px; /* evita o zoom automático do iPhone */
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Animações
+   --------------------------------------------------------------------- */
+
+/* Troca de página: desliza para o lado da aba escolhida. */
+@keyframes pagina-direita {
+  from { opacity: 0; transform: translateX(28px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes pagina-esquerda {
+  from { opacity: 0; transform: translateX(-28px); }
+  to { opacity: 1; transform: none; }
+}
+.animar-pagina-direita {
+  animation: pagina-direita 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.animar-pagina-esquerda {
+  animation: pagina-esquerda 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Janelas: sobem de baixo no celular, aparecem com zoom no computador. */
+@keyframes fundo-entrar {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fundo-sair {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes folha-entrar {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+@keyframes folha-sair {
+  from { transform: none; }
+  to { transform: translateY(100%); }
+}
+@keyframes janela-entrar {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes janela-sair {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(12px) scale(0.97); }
+}
+.fundo-entrar { animation: fundo-entrar 0.25s ease-out; }
+.fundo-sair { animation: fundo-sair 0.22s ease-in forwards; }
+.folha-entrar { animation: folha-entrar 0.32s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.folha-sair { animation: folha-sair 0.24s cubic-bezier(0.4, 0, 1, 1) forwards; }
+@media (min-width: 48rem) {
+  .folha-entrar { animation-name: janela-entrar; animation-duration: 0.22s; }
+  .folha-sair { animation-name: janela-sair; animation-duration: 0.18s; }
+}
+
+/* Item que acabou de mudar de posição (reordenar categorias). */
+@keyframes destacar {
+  from { background-color: color-mix(in srgb, var(--primaria) 18%, transparent); }
+  to { background-color: transparent; }
+}
+.animar-destaque {
+  animation: destacar 0.6s ease-out;
+}
+
+/* PIN errado: as bolinhas tremem. */
+@keyframes tremer {
+  0%, 100% { transform: none; }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+.animar-tremer {
+  animation: tremer 0.35s ease-in-out;
+}
+
+/* Quem pede menos movimento no sistema (acessibilidade) recebe tudo instantâneo. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Áreas seguras do iPhone (notch e barra de gestos). */
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@utility pl-safe {
+  padding-left: env(safe-area-inset-left);
+}
+
+@utility pr-safe {
+  padding-right: env(safe-area-inset-right);
+}
