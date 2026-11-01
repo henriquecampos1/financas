@@ -152,7 +152,8 @@ export function EditorLancamento({
     if (credito) lembrar('ultimoCartao', dados.cartaoId)
     else {
       lembrar('ultimaConta', dados.contaId)
-      lembrar('ultimoMetodo', dados.metodo)
+      // A forma de uma receita (ex.: transferência do salário) não vira o padrão dos gastos.
+      if (dados.tipo === 'despesa') lembrar('ultimoMetodo', dados.metodo)
     }
     controle.fechar()
   }

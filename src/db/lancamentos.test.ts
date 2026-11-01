@@ -84,7 +84,19 @@ describe('salvar, editar e excluir lançamentos', () => {
   it('lista as tags usadas', async () => {
     await salvarLancamento(dados({ tags: ['viagem-rio', 'trabalho'] }), undefined, banco)
     await salvarLancamento(dados({ tags: ['viagem-rio'] }), undefined, banco)
+    await salvarLancamento(dados({ tags: [] }), undefined, banco)
     expect(await todasAsTags(banco)).toEqual(['trabalho', 'viagem-rio'])
+  })
+
+  it('não usa consultas que quebram no Safari do iPhone', () => {
+    // "UnknownError: Unable to open cursor": percorrer índice de vários valores (*tags) pedindo só os únicos.
+    const arquivos = import.meta.glob('/src/**/*.{ts,tsx}', { query: '?raw', import: 'default', eager: true })
+    expect(Object.keys(arquivos).length).toBeGreaterThan(30)
+    const proibidos = Object.entries(arquivos)
+      .filter(([caminho]) => !caminho.endsWith('.test.ts'))
+      .filter(([, codigo]) => /uniqueKeys\(|orderBy\(['"]tags['"]\)/.test(codigo as string))
+      .map(([caminho]) => caminho)
+    expect(proibidos).toEqual([])
   })
 })
 

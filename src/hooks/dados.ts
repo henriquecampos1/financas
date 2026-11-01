@@ -67,6 +67,7 @@ export function useLimitesUsados(): Map<string, number> | undefined {
   return useLiveQuery(() => limitesUsados())
 }
 
+/** Tags para sugestão. São só um atalho: se a leitura falhar, o formulário abre sem sugestões. */
 export function useTags(): string[] | undefined {
-  return useLiveQuery(() => todasAsTags())
+  return useLiveQuery(() => todasAsTags().catch(() => []))
 }

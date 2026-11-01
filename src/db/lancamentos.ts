@@ -73,7 +73,13 @@ export async function excluirPagamento(id: string, banco: BancoFinancas = db) {
   await banco.pagamentosFatura.delete(id)
 }
 
-/** Todas as tags já usadas, em ordem alfabética. */
+/**
+ * Todas as tags já usadas, em ordem alfabética.
+ * Lê os lançamentos de uma vez em vez de percorrer o índice de tags: no Safari do iPhone,
+ * percorrer esse índice (de vários valores) pedindo só os únicos dá "UnknownError: Unable to open cursor".
+ */
 export async function todasAsTags(banco: BancoFinancas = db): Promise<string[]> {
-  return (await banco.lancamentos.orderBy('tags').uniqueKeys()).map(String)
+  const tags = new Set<string>()
+  for (const l of await banco.lancamentos.toArray()) for (const t of l.tags ?? []) tags.add(t)
+  return [...tags].sort((a, b) => a.localeCompare(b, 'pt-BR'))
 }

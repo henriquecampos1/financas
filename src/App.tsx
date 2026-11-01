@@ -2,6 +2,7 @@ import { MotionConfig } from 'motion/react'
 import { createHashRouter, Navigate, RouterProvider } from 'react-router'
 import { Bloqueio } from '@/components/Bloqueio'
 import { Layout } from '@/components/Layout'
+import { TelaDeErro } from '@/components/TelaDeErro'
 import { ProvedorAjustes } from '@/hooks/ajustes'
 import { ProvedorCiclo } from '@/hooks/ciclo'
 import { ProvedorPrivacidade } from '@/hooks/privacidade'
@@ -24,6 +25,7 @@ const router = createHashRouter([
   {
     path: '/',
     Component: Layout,
+    ErrorBoundary: TelaDeErro,
     children: [
       { index: true, Component: Inicio },
       { path: 'transacoes', Component: Transacoes },
