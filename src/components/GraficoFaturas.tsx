@@ -3,6 +3,7 @@
 import clsx from 'clsx'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
+import { motion } from 'motion/react'
 import { useEffect, useRef } from 'react'
 import { deISO } from '@/utils/datas'
 import { formatarCompacto, formatarReais } from '@/utils/dinheiro'
@@ -63,12 +64,14 @@ export function GraficoFaturas({
               {valor > 0 ? formatarCompacto(valor) : '—'}
             </span>
             <span className="flex w-full items-end justify-center" style={{ height: ALTURA_MAXIMA }}>
-              <span
+              <motion.span
                 className={clsx(
-                  'w-9 rounded-t-lg transition-all duration-300',
-                  ativo ? 'bg-credito' : r.situacao === 'vencida' ? 'bg-perigo/60' : 'bg-credito/30',
+                  'w-9 rounded-t-xl rounded-b-md transition-colors duration-300',
+                  ativo ? 'bg-credito' : r.situacao === 'vencida' ? 'bg-perigo/60' : 'bg-credito/25',
                 )}
-                style={{ height: altura }}
+                initial={{ height: 3 }}
+                animate={{ height: altura }}
+                transition={{ type: 'spring', stiffness: 160, damping: 22 }}
               />
             </span>
             <span

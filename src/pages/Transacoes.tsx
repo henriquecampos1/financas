@@ -8,6 +8,7 @@ import { FiltrosAtivos, PainelFiltros, filtrar, quantosFiltros, type ValoresFilt
 import { ListaPorDia, useReferencias } from '@/components/ListaLancamentos'
 import { CartaoFatura, useResumoCartoes } from '@/components/ResumoCartoes'
 import { SeletorCiclo } from '@/components/SeletorCiclo'
+import { ValorPrivado } from '@/components/Valor'
 import { BotaoIcone, Cabecalho, Entrada, Segmentado, Vazio } from '@/components/ui'
 import { useCiclo } from '@/hooks/ciclo'
 import { useContas, useItensDoPeriodo, useSaldosDasContas } from '@/hooks/dados'
@@ -21,15 +22,19 @@ function FaixaCartoes() {
     return (
       <Link
         to="/contas"
-        className="flex min-h-14 items-center justify-center gap-2 rounded-2xl border border-dashed border-borda font-semibold text-credito"
+        className="tocavel flex min-h-16 items-center justify-center gap-2 rounded-3xl border border-dashed border-borda font-semibold text-credito"
       >
         <Plus className="size-5" /> Cadastrar cartão de crédito
       </Link>
     )
   return (
-    <div className="-mx-4 flex snap-x items-start gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+    <div className="sem-barra -mx-4 flex snap-x snap-mandatory items-start gap-3 overflow-x-auto px-4 pb-2">
       {resumos.map((r) => (
-        <CartaoFatura key={r.cartao.id} resumo={r} className="w-72 shrink-0 snap-start" />
+        <CartaoFatura
+          key={r.cartao.id}
+          resumo={r}
+          className={clsx('shrink-0 snap-center', resumos.length > 1 ? 'w-[86%]' : 'w-full')}
+        />
       ))}
     </div>
   )
@@ -44,13 +49,13 @@ function FaixaContas({ selecionada, aoEscolher }: { selecionada?: string; aoEsco
     return (
       <Link
         to="/contas"
-        className="flex min-h-14 items-center justify-center gap-2 rounded-2xl border border-dashed border-borda font-semibold text-primaria"
+        className="tocavel flex min-h-16 items-center justify-center gap-2 rounded-3xl border border-dashed border-borda font-semibold text-primaria"
       >
         <Plus className="size-5" /> Cadastrar conta (Nubank, Itaú, Carteira...)
       </Link>
     )
   return (
-    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none]">
+    <div className="sem-barra -mx-4 flex gap-2.5 overflow-x-auto px-4 pb-2">
       {ativas.map((c) => {
         const ativa = selecionada === c.id
         return (
@@ -60,15 +65,18 @@ function FaixaContas({ selecionada, aoEscolher }: { selecionada?: string; aoEsco
             aria-pressed={ativa}
             onClick={() => aoEscolher(ativa ? undefined : c.id)}
             className={clsx(
-              'min-w-36 shrink-0 rounded-2xl border bg-cartao px-4 py-2 text-left transition',
-              ativa ? 'border-primaria ring-2 ring-primaria/30' : 'border-borda',
+              'tocavel min-w-40 shrink-0 rounded-3xl bg-cartao p-4 text-left shadow-cartao',
+              ativa && 'ring-2 ring-primaria',
             )}
           >
-            <span className="flex items-center gap-2 text-sm font-medium">
-              <span className="size-2.5 rounded-full" style={{ backgroundColor: c.cor }} aria-hidden />
+            <span className="flex items-center gap-2 text-[13px] font-medium text-suave">
+              <span className="flex size-6 items-center justify-center rounded-lg text-[11px] font-bold text-white" style={{ backgroundColor: c.cor }} aria-hidden>
+                {c.nome.charAt(0).toUpperCase()}
+              </span>
               {c.nome}
             </span>
-            <span className="block font-bold">{formatarReais(saldos?.get(c.id) ?? c.saldoInicial)}</span>
+            <ValorPrivado centavos={saldos?.get(c.id) ?? c.saldoInicial} className="numeros mt-2 block text-[17px] font-bold" />
+            <span className="block text-[11px] text-suave">saldo hoje</span>
           </button>
         )
       })}
@@ -115,7 +123,7 @@ export function Transacoes() {
         </div>
       </Cabecalho>
 
-      <div className="mx-auto max-w-2xl space-y-4 px-4 pt-4">
+      <div className="mx-auto max-w-2xl space-y-4 px-4 pt-3">
         {area === 'credito' ? (
           <FaixaCartoes />
         ) : (
@@ -124,20 +132,20 @@ export function Transacoes() {
 
         <div className="flex gap-2">
           <label className="relative min-w-0 flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-suave" />
+            <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-suave" />
             <Entrada
               type="search"
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
               placeholder="Buscar descrição, categoria, tag"
               aria-label="Buscar"
-              className="pl-10"
+              className="border-transparent pl-11 shadow-cartao"
             />
           </label>
           <BotaoIcone
             rotulo="Filtros"
             onClick={() => setPainel(true)}
-            className={clsx('relative size-12 border border-borda bg-cartao', ativos && 'text-primaria')}
+            className={clsx('relative size-[52px] rounded-2xl bg-cartao shadow-cartao', ativos && 'text-primaria')}
           >
             <SlidersHorizontal className="size-5" />
             {ativos > 0 && (

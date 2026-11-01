@@ -84,7 +84,7 @@ function EscolhaArea({
               prepararTeclado()
               aoEscolher(area, base)
             }}
-            className="flex w-full items-center gap-4 rounded-2xl border border-borda bg-cartao p-4 text-left transition active:scale-[0.99]"
+            className="tocavel flex w-full items-center gap-4 rounded-3xl bg-cartao p-4 text-left shadow-cartao"
           >
             <span className={`flex size-14 shrink-0 items-center justify-center rounded-2xl ${classe}`}>
               <Icone className="size-7" />

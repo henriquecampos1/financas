@@ -1,7 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --ease-mola: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Cores que mudam entre o modo claro e o escuro (o tema segue o do sistema). */
@@ -23,27 +24,40 @@
   --color-barra-ok: var(--barra-ok);
   --color-barra-atencao: var(--barra-atencao);
   --color-barra-excedido: var(--barra-excedido);
+  --shadow-cartao: var(--sombra-cartao);
+  --shadow-flutuante: var(--sombra-flutuante);
 }
 
 :root {
   color-scheme: light;
-  --fundo: #f5f6f8;
+  --fundo: #f2f3f7;
   --cartao: #ffffff;
-  --cartao-2: #eef0f3;
-  --borda: #e1e4ea;
-  --texto: #15181e;
-  --suave: #5d6472;
+  --cartao-2: #f1f2f6;
+  --borda: #e6e8ee;
+  --texto: #0f1115;
+  --suave: #6a6f7d;
   --primaria: #0d7a5f;
   --primaria-texto: #ffffff;
   --credito: #6a4bd8;
-  --receita: #1a7f37;
+  --receita: #138a4b;
   --despesa: #c42b1c;
   --perigo: #b42318;
   --alerta: #9a5b00;
-  --sucesso: #1a7f37;
-  --barra-ok: #22a06b;
-  --barra-atencao: #e2a400;
-  --barra-excedido: #d93a2b;
+  --sucesso: #138a4b;
+  --barra-ok: #1fb57a;
+  --barra-atencao: #e8a600;
+  --barra-excedido: #e5484d;
+  /* Sombras macias (no escuro, a separação vem do contorno claro). */
+  --sombra-cartao: 0 1px 2px rgb(16 24 40 / 0.04), 0 4px 18px rgb(16 24 40 / 0.05);
+  --sombra-flutuante: 0 10px 30px rgb(16 24 40 / 0.14), 0 2px 8px rgb(16 24 40 / 0.08);
+  --contorno: rgb(16 24 40 / 0.05);
+  /* Vidro da barra de abas e do topo. */
+  --vidro: rgb(255 255 255 / 0.72);
+  --vidro-topo: rgb(242 243 247 / 0.82);
+  /* Degradê do cartão principal (Início). */
+  --heroi-1: #08493a;
+  --heroi-2: #0d7a5f;
+  --heroi-3: #17a883;
   /* Formas de pagamento nos gráficos: ordem validada para daltonismo (claro e escuro). */
   --grafico-credito: #6250d6;
   --grafico-pix: #1baf7a;
@@ -56,23 +70,31 @@
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --fundo: #0e1116;
-    --cartao: #171b22;
-    --cartao-2: #21262f;
-    --borda: #2b313c;
-    --texto: #e7e9ee;
-    --suave: #9aa1ae;
+    --fundo: #08090b;
+    --cartao: #141619;
+    --cartao-2: #1d2025;
+    --borda: #262a31;
+    --texto: #f3f4f6;
+    --suave: #8f95a3;
     --primaria: #4fd1a5;
-    --primaria-texto: #0e1116;
+    --primaria-texto: #04130e;
     --credito: #a996ff;
-    --receita: #5fd38a;
-    --despesa: #ff8a7a;
+    --receita: #4fd18b;
+    --despesa: #ff7b6e;
     --perigo: #ff8a80;
     --alerta: #ffc04d;
-    --sucesso: #5fd38a;
+    --sucesso: #4fd18b;
     --barra-ok: #3ccf91;
     --barra-atencao: #f5c242;
-    --barra-excedido: #ff6b5c;
+    --barra-excedido: #ff6369;
+    --sombra-cartao: inset 0 0 0 1px rgb(255 255 255 / 0.05);
+    --sombra-flutuante: 0 10px 34px rgb(0 0 0 / 0.55), inset 0 0 0 1px rgb(255 255 255 / 0.08);
+    --contorno: rgb(255 255 255 / 0.06);
+    --vidro: rgb(26 28 33 / 0.7);
+    --vidro-topo: rgb(8 9 11 / 0.8);
+    --heroi-1: #052c23;
+    --heroi-2: #0a5c48;
+    --heroi-3: #12886a;
     --grafico-credito: #9085e9;
     --grafico-pix: #199e70;
     --grafico-transferencia: #d95926;
@@ -91,8 +113,9 @@ body {
 body {
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
   overscroll-behavior-y: none;
-  font-variant-numeric: tabular-nums;
+  text-rendering: optimizeLegibility;
 }
 
 /* Na camada "base", para que classes como text-4xl ainda consigam aumentar a letra. */
@@ -102,61 +125,43 @@ body {
   textarea {
     font-size: 16px; /* evita o zoom automático do iPhone */
   }
+  button {
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+}
+
+/* Números alinhados em colunas (listas, tabelas). Valores grandes soltos usam números proporcionais. */
+@utility numeros {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Fundo de vidro fosco (barra de abas, topo, botão +). */
+@utility vidro {
+  background-color: var(--vidro);
+  -webkit-backdrop-filter: saturate(180%) blur(22px);
+  backdrop-filter: saturate(180%) blur(22px);
+}
+
+/* Toque: o elemento "afunda" um pouco, como nos apps nativos. */
+@utility tocavel {
+  transition: transform 0.18s var(--ease-mola), background-color 0.2s, opacity 0.2s;
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+/* Esconde a barra de rolagem horizontal (faixas de cartões). */
+@utility sem-barra {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* ---------------------------------------------------------------------
-   Animações
+   Animações em CSS (as de página e painéis usam a biblioteca Motion)
    --------------------------------------------------------------------- */
-
-/* Troca de página: desliza para o lado da aba escolhida. */
-@keyframes pagina-direita {
-  from { opacity: 0; transform: translateX(28px); }
-  to { opacity: 1; transform: none; }
-}
-@keyframes pagina-esquerda {
-  from { opacity: 0; transform: translateX(-28px); }
-  to { opacity: 1; transform: none; }
-}
-.animar-pagina-direita {
-  animation: pagina-direita 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-.animar-pagina-esquerda {
-  animation: pagina-esquerda 0.26s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-/* Janelas: sobem de baixo no celular, aparecem com zoom no computador. */
-@keyframes fundo-entrar {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes fundo-sair {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
-@keyframes folha-entrar {
-  from { transform: translateY(100%); }
-  to { transform: none; }
-}
-@keyframes folha-sair {
-  from { transform: none; }
-  to { transform: translateY(100%); }
-}
-@keyframes janela-entrar {
-  from { opacity: 0; transform: translateY(12px) scale(0.97); }
-  to { opacity: 1; transform: none; }
-}
-@keyframes janela-sair {
-  from { opacity: 1; transform: none; }
-  to { opacity: 0; transform: translateY(12px) scale(0.97); }
-}
-.fundo-entrar { animation: fundo-entrar 0.25s ease-out; }
-.fundo-sair { animation: fundo-sair 0.22s ease-in forwards; }
-.folha-entrar { animation: folha-entrar 0.32s cubic-bezier(0.2, 0.8, 0.2, 1); }
-.folha-sair { animation: folha-sair 0.24s cubic-bezier(0.4, 0, 1, 1) forwards; }
-@media (min-width: 48rem) {
-  .folha-entrar { animation-name: janela-entrar; animation-duration: 0.22s; }
-  .folha-sair { animation-name: janela-sair; animation-duration: 0.18s; }
-}
 
 /* Item que acabou de mudar de posição (reordenar categorias). */
 @keyframes destacar {
@@ -175,6 +180,15 @@ body {
 }
 .animar-tremer {
   animation: tremer 0.35s ease-in-out;
+}
+
+/* Brilho que passa devagar no cartão principal. */
+@keyframes brilho {
+  from { transform: translateX(-120%) rotate(12deg); }
+  to { transform: translateX(220%) rotate(12deg); }
+}
+.animar-brilho {
+  animation: brilho 2.4s 0.4s var(--ease-mola) both;
 }
 
 /* Quem pede menos movimento no sistema (acessibilidade) recebe tudo instantâneo. */

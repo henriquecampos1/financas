@@ -2,7 +2,8 @@
 import clsx from 'clsx'
 import { format, isToday, isYesterday } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-import { useMemo } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
+import { useMemo, type ReactNode } from 'react'
 import type { Cartao, Categoria, Conta } from '@/db/tipos'
 import { useCategorias } from '@/hooks/categorias'
 import { useCartoes, useContas } from '@/hooks/dados'
@@ -57,24 +58,24 @@ export function LinhaLancamento({ item, refs }: { item: ItemCompetencia; refs: R
     <button
       type="button"
       onClick={() => editar(l)}
-      className="flex min-h-16 w-full items-center gap-3 px-4 py-2 text-left active:bg-cartao-2"
+      className="flex min-h-[68px] w-full items-center gap-3 px-4 py-2.5 text-left transition-colors active:bg-cartao-2"
     >
       <IconeCategoria icone={categoria?.icone ?? '❔'} cor={categoria?.cor ?? '#868e96'} />
       <span className="min-w-0 flex-1">
         <span className="flex items-center gap-2">
-          <span className="truncate font-medium">{l.descricao || categoria?.nome || 'Lançamento'}</span>
+          <span className="truncate font-semibold">{l.descricao || categoria?.nome || 'Lançamento'}</span>
           {item.rotuloParcela && (
-            <span className="shrink-0 rounded-md bg-credito/12 px-1.5 text-xs font-semibold text-credito">
+            <span className="shrink-0 rounded-full bg-credito/12 px-2 py-px text-[11px] font-bold text-credito">
               {item.rotuloParcela}
             </span>
           )}
         </span>
-        <span className="block truncate text-sm text-suave">
+        <span className="block truncate text-[13px] text-suave">
           {detalhes.join(' · ')}
           {l.tags.length > 0 && <span className="text-primaria"> {l.tags.map((t) => `#${t}`).join(' ')}</span>}
         </span>
       </span>
-      <span className={clsx('shrink-0 text-right font-semibold', receita ? 'text-receita' : 'text-texto')}>
+      <span className={clsx('numeros shrink-0 text-right font-semibold', receita ? 'text-receita' : 'text-texto')}>
         {receita ? '+' : '−'}
         {formatarReais(item.valor)}
       </span>
@@ -82,23 +83,50 @@ export function LinhaLancamento({ item, refs }: { item: ItemCompetencia; refs: R
   )
 }
 
+/** Linha que entra "abrindo" (ao lançar) e sai "fechando" (ao excluir). */
+function LinhaAnimada({ children }: { children: ReactNode }) {
+  return (
+    <motion.div
+      initial={{ height: 0, opacity: 0 }}
+      animate={{ height: 'auto', opacity: 1 }}
+      exit={{ height: 0, opacity: 0 }}
+      transition={{ height: { type: 'spring', stiffness: 380, damping: 36 }, opacity: { duration: 0.2 } }}
+      className="overflow-hidden"
+    >
+      {children}
+    </motion.div>
+  )
+}
+
 export function ListaPorDia({ itens, refs }: { itens: ItemCompetencia[]; refs: Referencias }) {
   const dias = useMemo(() => agruparPorDia(itens), [itens])
   return (
-    <div className="space-y-4">
-      {dias.map((dia) => (
-        <section key={dia.data}>
-          <div className="mb-1 flex items-baseline justify-between px-1">
-            <h3 className="text-sm font-semibold text-suave">{rotuloDia(dia.data)}</h3>
-            <span className="text-xs text-suave">{formatarReais(dia.saldo)}</span>
-          </div>
-          <div className="divide-y divide-borda overflow-hidden rounded-2xl border border-borda bg-cartao">
-            {dia.itens.map((item) => (
-              <LinhaLancamento key={item.id} item={item} refs={refs} />
-            ))}
-          </div>
-        </section>
-      ))}
+    <div className="space-y-5">
+      <AnimatePresence initial={false}>
+        {dias.map((dia) => (
+          <motion.section
+            key={dia.data}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="mb-2 flex items-baseline justify-between px-1">
+              <h3 className="text-[15px] font-semibold">{rotuloDia(dia.data)}</h3>
+              <span className="numeros text-xs font-medium text-suave">{formatarReais(dia.saldo)}</span>
+            </div>
+            <div className="divide-y divide-borda overflow-hidden rounded-3xl bg-cartao shadow-cartao">
+              <AnimatePresence initial={false}>
+                {dia.itens.map((item) => (
+                  <LinhaAnimada key={item.id}>
+                    <LinhaLancamento item={item} refs={refs} />
+                  </LinhaAnimada>
+                ))}
+              </AnimatePresence>
+            </div>
+          </motion.section>
+        ))}
+      </AnimatePresence>
     </div>
   )
 }

@@ -124,7 +124,7 @@ export function EditorPlano({ ciclo, plano, aoFechar }: { ciclo: Ciclo; plano: P
         )}
 
         <TituloSecao>Limite por categoria</TituloSecao>
-        <div className="divide-y divide-borda overflow-hidden rounded-2xl border border-borda bg-cartao">
+        <div className="divide-y divide-borda overflow-hidden rounded-3xl bg-cartao shadow-cartao">
           {lista.map((c) => {
             const gastoNoAnterior = gastoAnterior.get(c.id)
             return (

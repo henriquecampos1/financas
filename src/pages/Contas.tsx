@@ -1,9 +1,9 @@
 // Mais → Contas e cartões.
-import { ChevronDown, ChevronRight, Plus } from 'lucide-react'
+import { ChevronDown, ChevronRight, Plus, Wifi } from 'lucide-react'
 import { useState } from 'react'
 import clsx from 'clsx'
 import { EditorCartao, EditorConta } from '@/components/EditoresConta'
-import { BarraLimite } from '@/components/ResumoCartoes'
+import { BarraLimite, fundoDoCartao } from '@/components/ResumoCartoes'
 import { Botao, Cabecalho, Cartao, TituloSecao, Vazio } from '@/components/ui'
 import type { Cartao as TipoCartao, Conta } from '@/db/tipos'
 import { useCartoes, useContas, useLimitesUsados, useSaldosDasContas } from '@/hooks/dados'
@@ -38,14 +38,20 @@ export function Contas() {
                 key={c.id}
                 type="button"
                 onClick={() => setEdicao({ tipo: 'conta', conta: c })}
-                className="flex min-h-16 w-full items-center gap-3 px-4 text-left active:bg-cartao-2"
+                className="flex min-h-[68px] w-full items-center gap-3 px-4 text-left transition-colors active:bg-cartao-2"
               >
-                <span className="size-3.5 shrink-0 rounded-full" style={{ backgroundColor: c.cor }} aria-hidden />
-                <span className={clsx('min-w-0 flex-1 truncate font-medium', c.arquivada && 'text-suave')}>
+                <span
+                  className="flex size-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-white"
+                  style={{ backgroundColor: c.cor }}
+                  aria-hidden
+                >
+                  {c.nome.charAt(0).toUpperCase()}
+                </span>
+                <span className={clsx('min-w-0 flex-1 truncate font-semibold', c.arquivada && 'text-suave')}>
                   {c.nome}
                   {c.arquivada && ' (arquivada)'}
                 </span>
-                <span className="font-semibold">{formatarReais(saldos?.get(c.id) ?? c.saldoInicial)}</span>
+                <span className="numeros font-semibold">{formatarReais(saldos?.get(c.id) ?? c.saldoInicial)}</span>
                 <ChevronRight className="size-5 text-suave" />
               </button>
             ))}
@@ -65,24 +71,28 @@ export function Contas() {
                 key={c.id}
                 type="button"
                 onClick={() => setEdicao({ tipo: 'cartao', cartao: c })}
-                className="block w-full overflow-hidden rounded-2xl border border-borda bg-cartao text-left active:scale-[0.99]"
+                className={clsx(
+                  'tocavel relative block w-full overflow-hidden rounded-[26px] p-5 text-left text-white shadow-flutuante',
+                  c.arquivado && 'opacity-60',
+                )}
+                style={fundoDoCartao(c.cor)}
               >
-                <div className="h-1.5" style={{ backgroundColor: c.cor }} aria-hidden />
-                <div className="space-y-2 p-4">
+                <span className="pointer-events-none absolute -right-10 -top-16 size-44 rounded-full bg-white/10" aria-hidden />
+                <div className="relative space-y-3">
                   <div className="flex items-center gap-2">
-                    <span className={clsx('min-w-0 flex-1 truncate font-semibold', c.arquivado && 'text-suave')}>
+                    <span className="min-w-0 flex-1 truncate text-lg font-semibold">
                       {c.nome}
                       {c.arquivado && ' (arquivado)'}
                     </span>
-                    <ChevronRight className="size-5 text-suave" />
+                    <Wifi className="size-5 rotate-90 text-white/80" aria-hidden />
                   </div>
-                  <p className="text-sm text-suave">
+                  <p className="text-sm text-white/80">
                     Fecha dia {c.diaFechamento} · vence dia {c.diaVencimento}
                   </p>
                   {c.limite > 0 ? (
-                    <BarraLimite usado={usados?.get(c.id) ?? 0} limite={c.limite} />
+                    <BarraLimite usado={usados?.get(c.id) ?? 0} limite={c.limite} clara />
                   ) : (
-                    <p className="text-xs text-suave">Limite não informado</p>
+                    <p className="text-xs text-white/75">Limite não informado</p>
                   )}
                 </div>
               </button>

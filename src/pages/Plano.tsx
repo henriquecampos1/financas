@@ -2,7 +2,7 @@
 import clsx from 'clsx'
 import { CopyPlus, Pencil, Target } from 'lucide-react'
 import { useState } from 'react'
-import { BarraProgresso, COR_TEXTO, LinhaCategoriaPlano } from '@/components/BarrasPlano'
+import { AnelProgresso, BarraProgresso, COR_TEXTO, LinhaCategoriaPlano } from '@/components/BarrasPlano'
 import { EditorPlano } from '@/components/EditorPlano'
 import { FolhaLancamentos } from '@/components/FolhaLancamentos'
 import { useReferencias } from '@/components/ListaLancamentos'
@@ -24,26 +24,22 @@ function ResumoGeral({ resumo }: { resumo: ResumoPlano }) {
   const excedido = resumo.disponivel < 0
 
   return (
-    <Cartao className="space-y-4 p-4">
-      <div className="grid grid-cols-3 gap-2 text-center">
-        <div>
-          <p className="text-xs text-suave">Planejado</p>
-          <p className="font-bold">{formatarReais(resumo.planejado)}</p>
-        </div>
-        <div>
-          <p className="text-xs text-suave">Gasto</p>
-          <p className="font-bold">{formatarReais(resumo.gasto)}</p>
-        </div>
-        <div>
-          <p className="text-xs text-suave">{excedido ? 'Excedido' : 'Disponível'}</p>
-          <p className={clsx('font-bold', excedido ? 'text-perigo' : 'text-sucesso')}>
+    <Cartao className="space-y-5 p-5">
+      <div className="flex items-center gap-5">
+        <AnelProgresso porcentagem={resumo.porcentagem} faixa={resumo.faixa} tamanho={92} />
+        <div className="min-w-0 flex-1">
+          <p className="text-[13px] text-suave">{excedido ? 'Passou do planejado' : 'Ainda disponível'}</p>
+          <p className={clsx('text-[28px] font-bold leading-tight tracking-tight', excedido && 'text-perigo')}>
             {formatarReais(Math.abs(resumo.disponivel))}
+          </p>
+          <p className="numeros text-[13px] text-suave">
+            {formatarReais(resumo.gasto)} gastos de {formatarReais(resumo.planejado)}
           </p>
         </div>
       </div>
       <div>
         <BarraProgresso porcentagem={resumo.porcentagem} faixa={resumo.faixa} grossa marca={marca} />
-        <div className="mt-1 flex justify-between text-xs text-suave">
+        <div className="mt-1.5 flex justify-between text-xs text-suave">
           <span className={clsx('font-semibold', COR_TEXTO[resumo.faixa])}>{resumo.porcentagem}% usado</span>
           {marca !== undefined && <span>{marca}% do ciclo já passou</span>}
         </div>
@@ -53,14 +49,14 @@ function ResumoGeral({ resumo }: { resumo: ResumoPlano }) {
           O gasto inclui {formatarReais(resumo.gastoSemLimite)} em categorias sem limite.
         </p>
       )}
-      <div className="rounded-xl bg-cartao-2 p-3">
+      <div className={clsx('rounded-2xl p-4', ehAtual && resumo.porDia > 0 ? 'bg-primaria/10' : 'bg-cartao-2')}>
         {ehAtual ? (
           resumo.porDia > 0 ? (
             <>
-              <p className="text-sm text-suave">
+              <p className="text-[13px] text-suave">
                 Faltam {resumo.diasRestantes} dia{resumo.diasRestantes === 1 ? '' : 's'}. Você pode gastar
               </p>
-              <p className="text-2xl font-bold text-primaria">{formatarReais(resumo.porDia)} por dia</p>
+              <p className="text-[24px] font-bold tracking-tight text-primaria">{formatarReais(resumo.porDia)} por dia</p>
             </>
           ) : (
             <p className="text-sm font-semibold text-perigo">

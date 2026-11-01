@@ -93,8 +93,8 @@ function SecaoParcelas() {
             aria-checked={ativo}
             onClick={() => void salvarAjustes({ modoParcelas: m.valor })}
             className={clsx(
-              'flex w-full items-start gap-3 rounded-2xl border bg-cartao p-4 text-left transition',
-              ativo ? 'border-primaria ring-2 ring-primaria/30' : 'border-borda',
+              'tocavel flex w-full items-start gap-3 rounded-3xl bg-cartao p-4 text-left shadow-cartao',
+              ativo && 'ring-2 ring-primaria',
             )}
           >
             <span

@@ -159,7 +159,7 @@ export function EditorRecorrencia({ recorrencia, aoFechar }: { recorrencia?: Rec
         <Campo rotulo="Termina em (opcional)" dica="Deixe em branco se não tem data para acabar.">
           <Entrada type="date" value={d.fim ?? ''} min={d.inicio} onChange={(e) => mudar({ fim: e.target.value || undefined })} />
         </Campo>
-        <label className="flex items-start gap-3 rounded-2xl border border-borda bg-cartao p-3">
+        <label className="flex items-start gap-3 rounded-2xl bg-cartao p-4 shadow-cartao">
           <input
             type="checkbox"
             className="mt-0.5 size-5 accent-[var(--primaria)]"
@@ -174,7 +174,7 @@ export function EditorRecorrencia({ recorrencia, aoFechar }: { recorrencia?: Rec
           </span>
         </label>
         {recorrencia && (
-          <label className="flex items-center gap-3 rounded-2xl border border-borda bg-cartao p-3">
+          <label className="flex items-center gap-3 rounded-2xl bg-cartao p-4 shadow-cartao">
             <input
               type="checkbox"
               className="size-5 accent-[var(--primaria)]"

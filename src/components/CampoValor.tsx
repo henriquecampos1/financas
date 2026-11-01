@@ -24,8 +24,8 @@ export function CampoValor({ valor, aoMudar, tamanho = 'normal', className, onBl
   return (
     <div
       className={clsx(
-        'flex items-baseline gap-2 rounded-xl border border-borda bg-cartao px-3 focus-within:border-primaria focus-within:ring-2 focus-within:ring-primaria/30',
-        grande ? 'py-2' : 'min-h-12',
+        'flex items-baseline gap-2 rounded-2xl border border-borda bg-cartao px-4 transition focus-within:border-primaria focus-within:ring-4 focus-within:ring-primaria/15',
+        grande ? 'py-2.5' : 'min-h-[52px]',
         className,
       )}
     >

@@ -103,7 +103,7 @@ export function EditorCategoria({
             <strong>{categoria.nome}</strong> tem {emUso} lançamento{emUso > 1 ? 's' : ''} e não pode ser excluída
             direto. Escolha uma opção:
           </p>
-          <div className="space-y-2 rounded-2xl border border-borda bg-cartao p-4">
+          <div className="space-y-2 rounded-3xl bg-cartao p-4 shadow-cartao">
             <p className="font-semibold">Arquivar</p>
             <p className="text-sm text-suave">
               Some das listas para novos lançamentos, mas o histórico continua com ela.
@@ -112,7 +112,7 @@ export function EditorCategoria({
               <Archive className="size-5" /> Arquivar
             </Botao>
           </div>
-          <div className="space-y-2 rounded-2xl border border-borda bg-cartao p-4">
+          <div className="space-y-2 rounded-3xl bg-cartao p-4 shadow-cartao">
             <p className="font-semibold">Mover os lançamentos e excluir</p>
             {outras.length ? (
               <>

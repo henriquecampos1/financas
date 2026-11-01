@@ -1,7 +1,8 @@
-// Resumo da fatura atual de cada cartão (Início e Transações).
+// Resumo da fatura atual de cada cartão (Início e Transações), desenhado como um cartão de crédito.
 import clsx from 'clsx'
-import { AlertTriangle, ChevronRight } from 'lucide-react'
-import { useMemo } from 'react'
+import { AlertTriangle, Wifi } from 'lucide-react'
+import { motion } from 'motion/react'
+import { useMemo, type CSSProperties } from 'react'
 import { Link } from 'react-router'
 import type { Cartao } from '@/db/tipos'
 import { useCartoes, useCreditoCompleto } from '@/hooks/dados'
@@ -17,6 +18,7 @@ import {
   totaisPorFatura,
   type ResumoFatura,
 } from '@/utils/fatura'
+import { ValorPrivado } from './Valor'
 
 export interface ResumoCartao {
   cartao: Cartao
@@ -46,19 +48,28 @@ export function useResumoCartoes(): ResumoCartao[] | undefined {
   }, [cartoes, credito])
 }
 
-export function BarraLimite({ usado, limite }: { usado: number; limite: number }) {
+/** Fundo do cartão: a cor escolhida, escurecida em degradê (o texto branco sempre fica legível). */
+export function fundoDoCartao(cor: string): CSSProperties {
+  return {
+    background: `radial-gradient(120% 120% at 100% 0%, color-mix(in srgb, ${cor} 90%, white) 0%, transparent 45%), linear-gradient(135deg, color-mix(in srgb, ${cor} 78%, black) 0%, color-mix(in srgb, ${cor} 48%, black) 100%)`,
+  }
+}
+
+export function BarraLimite({ usado, limite, clara }: { usado: number; limite: number; clara?: boolean }) {
   if (limite <= 0) return null
   const pct = Math.min(100, Math.round((usado / limite) * 100))
   const disponivel = limite - usado
   return (
     <div>
-      <div className="h-1.5 overflow-hidden rounded-full bg-cartao-2">
-        <div
-          className={clsx('h-full rounded-full', pct >= 90 ? 'bg-barra-excedido' : 'bg-credito')}
-          style={{ width: `${pct}%` }}
+      <div className={clsx('h-1.5 overflow-hidden rounded-full', clara ? 'bg-white/20' : 'bg-cartao-2')}>
+        <motion.div
+          className={clsx('h-full rounded-full', clara ? 'bg-white' : pct >= 90 ? 'bg-barra-excedido' : 'bg-credito')}
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ type: 'spring', stiffness: 120, damping: 22 }}
         />
       </div>
-      <p className="mt-1 text-xs text-suave">
+      <p className={clsx('numeros mt-1.5 text-xs', clara ? 'text-white/75' : 'text-suave')}>
         {disponivel >= 0 ? `Disponível ${formatarReais(disponivel)}` : `Acima do limite em ${formatarReais(-disponivel)}`} de{' '}
         {formatarReais(limite)}
       </p>
@@ -71,45 +82,39 @@ export function CartaoFatura({ resumo, className }: { resumo: ResumoCartao; clas
   return (
     <Link
       to={`/fatura/${cartao.id}`}
-      className={clsx(
-        'block overflow-hidden rounded-2xl border border-borda bg-cartao transition active:scale-[0.99]',
-        className,
-      )}
+      className={clsx('tocavel relative block overflow-hidden rounded-[26px] p-5 text-white shadow-flutuante', className)}
+      style={fundoDoCartao(cartao.cor)}
     >
-      <div className="h-1.5" style={{ backgroundColor: cartao.cor }} aria-hidden />
-      <div className="space-y-2 p-4">
+      {/* Desenho de fundo: dois círculos translúcidos, como nos cartões de verdade. */}
+      <span className="pointer-events-none absolute -right-10 -top-16 size-44 rounded-full bg-white/10" aria-hidden />
+      <span className="pointer-events-none absolute -bottom-20 -left-8 size-40 rounded-full bg-black/10" aria-hidden />
+
+      <div className="relative space-y-3">
         <div className="flex items-center gap-2">
           <span className="min-w-0 flex-1 truncate font-semibold">{cartao.nome}</span>
-          <span className="rounded-full bg-cartao-2 px-2 py-0.5 text-xs font-semibold text-suave">
+          <span className="rounded-full bg-white/18 px-2.5 py-0.5 text-xs font-semibold backdrop-blur">
             {TEXTO_SITUACAO[atual.situacao]}
           </span>
-          <ChevronRight className="size-5 text-suave" />
+          <Wifi className="size-5 rotate-90 text-white/80" aria-hidden />
         </div>
         <div>
-          <p className="text-xs text-suave">Fatura de {rotuloFatura(atual.fatura)}</p>
-          <p className="text-2xl font-bold">{formatarReais(atual.valor)}</p>
+          <p className="text-xs text-white/75">Fatura de {rotuloFatura(atual.fatura)}</p>
+          <ValorPrivado centavos={atual.valor} className="block text-[28px] font-bold leading-tight tracking-tight" />
           {atual.antecipado > 0 && (
-            <p className="text-xs font-medium text-sucesso">
-              {formatarReais(atual.antecipado)} já antecipado (compras: {formatarReais(atual.compras)})
-            </p>
+            <p className="text-xs font-medium text-white/85">{formatarReais(atual.antecipado)} já antecipado</p>
           )}
-          <p className="text-xs text-suave">
-            Fecha {dataCurta(atual.fatura.fechamento)} · vence {dataCurta(atual.fatura.vencimento)}
+          <p className="text-xs text-white/75">
+            Fecha {dataCurta(atual.fatura.fechamento).slice(0, 5)} · vence {dataCurta(atual.fatura.vencimento).slice(0, 5)}
           </p>
         </div>
         {pendente && (
-          <p
-            className={clsx(
-              'flex items-start gap-1.5 rounded-lg px-2 py-1.5 text-xs font-medium',
-              pendente.situacao === 'vencida' ? 'bg-perigo/10 text-perigo' : 'bg-alerta/10 text-alerta',
-            )}
-          >
+          <p className="flex items-start gap-1.5 rounded-xl bg-black/25 px-2.5 py-2 text-xs font-medium">
             <AlertTriangle className="mt-px size-3.5 shrink-0" />
             Fatura de {rotuloFatura(pendente.fatura)} {pendente.situacao === 'vencida' ? 'vencida' : 'fechada'}:{' '}
-            {formatarReais(pendente.restante)} a pagar até {dataCurta(pendente.fatura.vencimento)}
+            {formatarReais(pendente.restante)} até {dataCurta(pendente.fatura.vencimento).slice(0, 5)}
           </p>
         )}
-        <BarraLimite usado={usado} limite={cartao.limite} />
+        <BarraLimite usado={usado} limite={cartao.limite} clara />
       </div>
     </Link>
   )

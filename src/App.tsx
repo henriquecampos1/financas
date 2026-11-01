@@ -1,8 +1,10 @@
+import { MotionConfig } from 'motion/react'
 import { createHashRouter, Navigate, RouterProvider } from 'react-router'
 import { Bloqueio } from '@/components/Bloqueio'
 import { Layout } from '@/components/Layout'
 import { ProvedorAjustes } from '@/hooks/ajustes'
 import { ProvedorCiclo } from '@/hooks/ciclo'
+import { ProvedorPrivacidade } from '@/hooks/privacidade'
 import { Ajustes } from '@/pages/Ajustes'
 import { Backup } from '@/pages/Backup'
 import { Categorias } from '@/pages/Categorias'
@@ -45,12 +47,17 @@ const router = createHashRouter([
 
 export function App() {
   return (
-    <ProvedorAjustes carregando={<div className="min-h-dvh bg-fundo" />}>
-      <Bloqueio>
-        <ProvedorCiclo>
-          <RouterProvider router={router} />
-        </ProvedorCiclo>
-      </Bloqueio>
-    </ProvedorAjustes>
+    // Animações seguem a preferência do sistema ("Reduzir movimento" desliga as maiores).
+    <MotionConfig reducedMotion="user">
+      <ProvedorAjustes carregando={<div className="min-h-dvh bg-fundo" />}>
+        <Bloqueio>
+          <ProvedorPrivacidade>
+            <ProvedorCiclo>
+              <RouterProvider router={router} />
+            </ProvedorCiclo>
+          </ProvedorPrivacidade>
+        </Bloqueio>
+      </ProvedorAjustes>
+    </MotionConfig>
   )
 }

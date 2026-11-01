@@ -60,8 +60,8 @@ function Escolhas({
             aria-checked={ativo}
             onClick={() => aoMudar(o.id)}
             className={clsx(
-              'inline-flex min-h-11 items-center gap-2 rounded-full border px-4 font-medium transition',
-              ativo ? 'border-primaria bg-primaria/10 ring-2 ring-primaria/30' : 'border-borda bg-cartao',
+              'tocavel inline-flex min-h-11 items-center gap-2 rounded-full px-4 font-medium',
+              ativo ? 'bg-primaria/12 text-texto ring-2 ring-primaria' : 'bg-cartao shadow-cartao',
             )}
           >
             <span className="size-3 rounded-full" style={{ backgroundColor: o.cor }} aria-hidden />
@@ -244,8 +244,8 @@ export function EditorLancamento({
                     aria-pressed={ativo}
                     onClick={() => mudar({ categoriaId: c.id })}
                     className={clsx(
-                      'flex min-h-20 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 transition',
-                      ativo ? 'bg-primaria/12 ring-2 ring-primaria' : 'active:bg-cartao-2',
+                      'tocavel flex min-h-[84px] flex-col items-center justify-center gap-1.5 rounded-[20px] px-1 py-2',
+                      ativo ? 'bg-primaria/10 ring-2 ring-primaria' : 'bg-cartao shadow-cartao',
                     )}
                   >
                     <IconeCategoria icone={c.icone} cor={c.cor} />
@@ -256,9 +256,9 @@ export function EditorLancamento({
               <button
                 type="button"
                 onClick={() => setCriando('categoria')}
-                className="flex min-h-20 flex-col items-center justify-center gap-1 rounded-2xl border border-dashed border-borda px-1 py-2 text-primaria active:bg-cartao-2"
+                className="tocavel flex min-h-[84px] flex-col items-center justify-center gap-1.5 rounded-[20px] border border-dashed border-borda px-1 py-2 text-primaria"
               >
-                <span className="flex size-10 items-center justify-center rounded-full bg-primaria/12">
+                <span className="flex size-11 items-center justify-center rounded-[14px] bg-primaria/12">
                   <Plus className="size-5" />
                 </span>
                 <span className="text-xs font-semibold">Nova</span>
@@ -354,7 +354,7 @@ export function EditorLancamento({
           </Campo>
 
           {podeRepetir && (
-            <label className="flex items-start gap-3 rounded-2xl border border-borda bg-cartao p-3">
+            <label className="flex items-start gap-3 rounded-2xl bg-cartao p-4 shadow-cartao">
               <input
                 type="checkbox"
                 className="mt-0.5 size-5 accent-[var(--primaria)]"

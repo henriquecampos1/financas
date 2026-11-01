@@ -27,7 +27,8 @@ const EIXO = { fill: 'var(--suave)', fontSize: 11 }
 
 /** Eixo de valores sem o "R$" (o título já diz que é dinheiro): "0", "500", "1,5 mil". */
 function rotuloEixo(centavos: number): string {
-  return formatarCompacto(centavos).replace('R$ ', '')
+  // Espaço que não quebra: o Recharts quebraria "1,5 mil" em duas linhas.
+  return formatarCompacto(centavos).replace('R$ ', '').replace(/ /g, ' ')
 }
 
 /** Propriedades comuns do eixo de valores, com marcas redondas. */
@@ -37,7 +38,7 @@ function eixoValores(maior: number, menor = 0) {
     tick: EIXO,
     tickLine: false,
     axisLine: false,
-    width: 44,
+    width: 50,
     ticks,
     domain: [ticks[0], ticks.at(-1)!] as [number, number],
     tickFormatter: rotuloEixo,
@@ -47,7 +48,7 @@ function eixoValores(maior: number, menor = 0) {
 /** Caixa de dica: o valor em destaque, o nome depois, com um traço da cor da série. */
 function CaixaDica({ titulo, linhas }: { titulo?: string; linhas: { cor: string; nome: string; valor: number; tracejado?: boolean }[] }) {
   return (
-    <div className="rounded-xl border border-borda bg-cartao px-3 py-2 text-sm shadow-lg">
+    <div className="rounded-2xl bg-cartao px-3 py-2 text-sm shadow-flutuante">
       {titulo && <p className="mb-1 text-xs text-suave">{titulo}</p>}
       {linhas.map((l) => (
         <p key={l.nome} className="flex items-center gap-2">

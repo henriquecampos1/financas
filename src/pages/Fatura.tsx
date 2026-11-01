@@ -1,14 +1,15 @@
 // Fatura de um cartão: barras por mês, valor, pagamentos (inclusive antecipados), limite e compras.
 import clsx from 'clsx'
 import { Check, ChevronLeft, ChevronRight, Pencil, X } from 'lucide-react'
+import { motion } from 'motion/react'
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router'
 import { CampoValor } from '@/components/CampoValor'
 import { EditorCartao } from '@/components/EditoresConta'
 import { GraficoFaturas } from '@/components/GraficoFaturas'
 import { ListaPorDia, useReferencias } from '@/components/ListaLancamentos'
-import { BarraLimite } from '@/components/ResumoCartoes'
-import { Botao, BotaoIcone, Cabecalho, Campo, Cartao, Entrada, Folha, Selecao, TituloSecao, Vazio, useFolha } from '@/components/ui'
+import { BarraLimite, fundoDoCartao } from '@/components/ResumoCartoes'
+import { Botao, BotaoIcone, Cabecalho, Campo, Cartao, Entrada, Folha, MOLA, Selecao, TituloSecao, Vazio, useFolha } from '@/components/ui'
 import { excluirPagamento, registrarPagamento } from '@/db/lancamentos'
 import type { Cartao as TipoCartao } from '@/db/tipos'
 import { useCartoes, useContas, useLancamentosDoCartao, usePagamentosDoCartao } from '@/hooks/dados'
@@ -28,15 +29,6 @@ import {
   totaisPorFatura,
   type Fatura as TipoFatura,
 } from '@/utils/fatura'
-
-const COR_SITUACAO = {
-  futura: 'bg-cartao-2 text-suave',
-  aberta: 'bg-credito/12 text-credito',
-  fechada: 'bg-alerta/12 text-alerta',
-  paga: 'bg-sucesso/12 text-sucesso',
-  vencida: 'bg-perigo/12 text-perigo',
-  'sem-gastos': 'bg-cartao-2 text-suave',
-}
 
 /** Faturas mostradas nas barras: duas antes da atual até nove depois (e sempre a escolhida). */
 function faturasDoGrafico(atual: TipoFatura, escolhida: TipoFatura, cartao: TipoCartao): TipoFatura[] {
@@ -199,28 +191,28 @@ export function Fatura() {
           </BotaoIcone>
         }
       >
-        <div className="flex items-center gap-1 rounded-xl bg-cartao-2 p-1">
+        <div className="flex items-center gap-1 rounded-2xl bg-cartao p-1 shadow-cartao">
           <BotaoIcone rotulo="Fatura anterior" onClick={() => irPara(deslocarFatura(fatura, -1, cartao))} className="size-10 text-texto">
-            <ChevronLeft className="size-6" />
+            <ChevronLeft className="size-5" strokeWidth={2.4} />
           </BotaoIcone>
-          <p className="min-w-0 flex-1 text-center font-semibold">Fatura de {rotuloFatura(fatura)}</p>
+          <p className="min-w-0 flex-1 text-center text-[15px] font-semibold">Fatura de {rotuloFatura(fatura)}</p>
           <BotaoIcone rotulo="Próxima fatura" onClick={() => irPara(deslocarFatura(fatura, 1, cartao))} className="size-10 text-texto">
-            <ChevronRight className="size-6" />
+            <ChevronRight className="size-5" strokeWidth={2.4} />
           </BotaoIcone>
         </div>
       </Cabecalho>
 
       <div className="mx-auto max-w-2xl space-y-4 px-4 pt-4">
         {outros.length > 1 && (
-          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none]">
+          <div className="sem-barra -mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
             {outros.map((c) => (
               <button
                 key={c.id}
                 type="button"
                 onClick={() => navigate(`/fatura/${c.id}`, { replace: true })}
                 className={clsx(
-                  'inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full border px-4 text-sm font-medium',
-                  c.id === cartao.id ? 'border-credito bg-credito/10 text-credito' : 'border-borda bg-cartao',
+                  'tocavel inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full px-4 text-sm font-semibold',
+                  c.id === cartao.id ? 'bg-credito/12 text-credito ring-2 ring-credito' : 'bg-cartao shadow-cartao',
                 )}
               >
                 <span className="size-2.5 rounded-full" style={{ backgroundColor: c.cor }} aria-hidden />
@@ -237,66 +229,68 @@ export function Fatura() {
           aoEscolher={(r) => irPara(r.fatura)}
         />
 
-        <Cartao className="space-y-3 p-4">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <p className="text-sm text-suave">Valor da fatura</p>
-              <p className="text-3xl font-bold">{formatarReais(valor)}</p>
+        {/* Resumo da fatura desenhado como o próprio cartão. */}
+        <motion.div
+          key={fatura.chave}
+          initial={{ opacity: 0.4, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={MOLA}
+          className="relative overflow-hidden rounded-[28px] p-5 text-white shadow-flutuante"
+          style={fundoDoCartao(cartao.cor)}
+        >
+          <span className="pointer-events-none absolute -right-12 -top-16 size-48 rounded-full bg-white/10" aria-hidden />
+          <span className="pointer-events-none absolute -bottom-24 -left-10 size-48 rounded-full bg-black/10" aria-hidden />
+          <div className="relative space-y-4">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm font-medium text-white/80">Valor da fatura</p>
+              <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-semibold">{TEXTO_SITUACAO[situacao]}</span>
             </div>
-            <span className={clsx('rounded-full px-3 py-1 text-sm font-semibold', COR_SITUACAO[situacao])}>
-              {TEXTO_SITUACAO[situacao]}
-            </span>
+            <div>
+              <p className="text-[36px] font-bold leading-none tracking-tight">{formatarReais(valor)}</p>
+              {antecipado > 0 && (
+                <p className="numeros mt-2 text-xs text-white/85">
+                  Compras {formatarReais(compras)} − antecipado {formatarReais(antecipado)}
+                </p>
+              )}
+            </div>
+            <dl className="grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <dt className="text-white/70">Compras de</dt>
+                <dd className="text-sm font-semibold">
+                  {dataCurta(fatura.inicio).slice(0, 5)} a {dataCurta(fatura.fim).slice(0, 5)}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-white/70">Fecha / vence</dt>
+                <dd className="text-sm font-semibold">
+                  {dataCurta(fatura.fechamento).slice(0, 5)} / {dataCurta(fatura.vencimento).slice(0, 5)}
+                </dd>
+              </div>
+            </dl>
+            <BarraLimite usado={dados.usado} limite={cartao.limite} clara />
           </div>
+        </motion.div>
 
-          {antecipado > 0 && (
-            <dl className="space-y-1 rounded-xl bg-cartao-2 p-3 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-suave">Compras</dt>
-                <dd>{formatarReais(compras)}</dd>
+        {(restante > 0 || antecipar) && (
+          <Botao variante="credito" className="w-full" onClick={() => setPagando(true)}>
+            {antecipar ? 'Antecipar pagamento' : 'Registrar pagamento'}
+          </Botao>
+        )}
+
+        {(pago > antecipado || dados.pagamentosDaFatura.length > 0) && (
+        <Cartao className="space-y-3 p-4">
+          {pago > antecipado && (
+            <dl className="grid grid-cols-2 gap-2 text-sm">
+              <div>
+                <dt className="text-suave">Pago após fechar</dt>
+                <dd className="font-medium text-sucesso">{formatarReais(pago - antecipado)}</dd>
               </div>
-              <div className="flex justify-between text-sucesso">
-                <dt>Pagamento antecipado</dt>
-                <dd>−{formatarReais(antecipado)}</dd>
-              </div>
-              <div className="flex justify-between border-t border-borda pt-1 font-semibold">
-                <dt>Valor da fatura</dt>
-                <dd>{formatarReais(valor)}</dd>
+              <div>
+                <dt className="text-suave">{restante >= 0 ? 'Falta pagar' : 'Pago a mais'}</dt>
+                <dd className="font-medium">{formatarReais(Math.abs(restante))}</dd>
               </div>
             </dl>
           )}
-
-          <dl className="grid grid-cols-2 gap-2 text-sm">
-            <div>
-              <dt className="text-suave">Compras de</dt>
-              <dd className="font-medium">
-                {dataCurta(fatura.inicio).slice(0, 5)} a {dataCurta(fatura.fim).slice(0, 5)}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-suave">Fecha / vence</dt>
-              <dd className="font-medium">
-                {dataCurta(fatura.fechamento).slice(0, 5)} / {dataCurta(fatura.vencimento)}
-              </dd>
-            </div>
-            {pago > antecipado && (
-              <>
-                <div>
-                  <dt className="text-suave">Pago após fechar</dt>
-                  <dd className="font-medium text-sucesso">{formatarReais(pago - antecipado)}</dd>
-                </div>
-                <div>
-                  <dt className="text-suave">{restante >= 0 ? 'Falta pagar' : 'Pago a mais'}</dt>
-                  <dd className="font-medium">{formatarReais(Math.abs(restante))}</dd>
-                </div>
-              </>
-            )}
-          </dl>
-
-          {restante > 0 || antecipar ? (
-            <Botao variante="credito" className="w-full" onClick={() => setPagando(true)}>
-              {antecipar ? 'Antecipar pagamento' : 'Registrar pagamento'}
-            </Botao>
-          ) : null}
 
           {dados.pagamentosDaFatura.length > 0 && (
             <ul className="divide-y divide-borda rounded-xl bg-cartao-2">
@@ -320,8 +314,8 @@ export function Fatura() {
               ))}
             </ul>
           )}
-          <BarraLimite usado={dados.usado} limite={cartao.limite} />
         </Cartao>
+        )}
 
         <TituloSecao>Compras nesta fatura</TituloSecao>
         {dados.itens.length ? (

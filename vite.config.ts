@@ -40,7 +40,7 @@ export default defineConfig({
         start_url: base,
         scope: base,
         theme_color: '#0d7a5f',
-        background_color: '#f5f6f8',
+        background_color: '#f2f3f7',
         icons: [
           { src: 'pwa-64x64.png', sizes: '64x64', type: 'image/png' },
           { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
